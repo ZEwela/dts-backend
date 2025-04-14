@@ -15,7 +15,7 @@ export const selectTaskById = async (taskId) => {
   );
   const task = response.rows[0];
   if (!task) {
-    return Promise.reject({ status: 404, msg: "Not found." });
+    return Promise.reject({ status: 404, msg: "Task not found." });
   }
   return task;
 };
@@ -38,5 +38,15 @@ export const insertTask = async ({
 
   const task = response.rows[0];
 
+  return task;
+};
+
+export const updateTaskById = async (taskId, status) => {
+  const response = await db.query(
+    `UPDATE tasks SET status = $1 WHERE task_id = $2 RETURNING *;`,
+    [status, taskId]
+  );
+
+  const task = response.rows[0];
   return task;
 };

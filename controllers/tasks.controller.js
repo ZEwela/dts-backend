@@ -2,6 +2,7 @@ import {
   insertTask,
   selectTaskById,
   selectAllTasks,
+  updateTaskById,
 } from "../models/tasks.model.js";
 
 export const getAllTasks = (req, res, next) => {
@@ -45,4 +46,29 @@ export const postTask = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+export const patchTaskStatusByTaskId = (req, res, next) => {
+  const taskId = req.params.task_id;
+  const { status } = req.body;
+
+  if (!status) {
+    return res.status(400).send({ msg: "Status is required." });
+  }
+
+  const validStatuses = ["Pending", "In Progress", "Completed"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).send({ msg: "Invalid status value." });
+  }
+
+  selectTaskById(taskId)
+    .then((task) => {
+      return updateTaskById(taskId, status);
+    })
+    .then((updatedTask) => {
+      res.status(200).send({ task: updatedTask });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

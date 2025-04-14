@@ -55,7 +55,7 @@ describe("GET /api/tasks/:task_id", () => {
       .expect(404)
       .then((response) => {
         const error = response.body;
-        expect(error.msg).toBe("Not found.");
+        expect(error.msg).toBe("Task not found.");
       });
   });
   test("STATUS 400: returns an error when passed invalid  task_id", () => {
@@ -177,5 +177,97 @@ describe("POST /api/tasks", () => {
       .expect(400);
 
     expect(response.body.msg).toBe("Invalid status value.");
+  });
+});
+
+describe("PATCH /api/tasks/:task_id", () => {
+  test("STATUS 200: successfully updates the task status", () => {
+    const newStatus = "Completed";
+    const body = { status: newStatus };
+
+    return request(app)
+      .patch("/api/tasks/1")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const task = response.body.task;
+        expect(task.status).toBe(newStatus);
+      });
+  });
+  test("STATUS 200: returns an updated task specified by task_id (change status to In Progress and then to Completed - multiple operations)", () => {
+    const newStatus = "In Progress";
+    const body = { status: newStatus };
+
+    return request(app)
+      .patch("/api/tasks/2")
+      .send(body)
+      .expect(200)
+      .then((response) => {
+        const task = response.body.task;
+        expect(task.status).toBe(newStatus);
+
+        const newStatus2 = "Completed";
+        const body2 = { status: newStatus2 };
+
+        return request(app)
+          .patch("/api/tasks/2")
+          .send(body2)
+          .expect(200)
+          .then((response) => {
+            const task = response.body.task;
+            expect(task.status).toBe(newStatus2);
+          });
+      });
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid task_id", () => {
+    const newStatus = "Completed";
+    const body = { status: newStatus };
+
+    return request(app)
+      .patch("/api/tasks/9999")
+      .send(body)
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Task not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid task_id", () => {
+    const newStatus = "Completed";
+    const body = { status: newStatus };
+
+    return request(app)
+      .patch("/api/tasks/not-valid")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+  test("STATUS 400: returns an error if status is not provided", () => {
+    const body = {};
+
+    return request(app)
+      .patch("/api/tasks/2")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Status is required.");
+      });
+  });
+  test("STATUS 400: returns an error if invalid status is provided", () => {
+    const newStatus = "Not a valid status";
+    const body = { status: newStatus };
+
+    return request(app)
+      .patch("/api/tasks/1")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Invalid status value.");
+      });
   });
 });
