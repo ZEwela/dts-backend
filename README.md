@@ -50,7 +50,7 @@ npm install
 
 ### 2. Environment setup
 
-Create `.env` files for different environments inside the `backend/` directory:
+Create `.env` files for different environments inside the `backend/` directory (see .env-example, check db/setup.sql for database name):
 
 #### `.env.development`
 
@@ -122,7 +122,7 @@ By default, the server will run on [http://localhost:9090](http://localhost:9090
 
 ## 🧪 Testing
 
-To run tests (if configured with Jest):
+To run tests
 
 ```bash
 npm test
