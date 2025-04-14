@@ -1,10 +1,8 @@
 import express from "express";
 
 const apiRouter = express.Router();
+import { tasksRouter } from "./tasks-router.js";
 
-// Test route
-apiRouter.get("/test", (req, res) => {
-  res.status(200).send("API is working!");
-});
+apiRouter.use("/tasks", tasksRouter);
 
 export default apiRouter;
