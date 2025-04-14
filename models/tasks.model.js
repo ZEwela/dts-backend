@@ -13,3 +13,24 @@ export const selectTaskById = async (taskId) => {
   }
   return task;
 };
+
+export const insertTask = async ({
+  title,
+  description,
+  status = "Pending",
+  due_date,
+}) => {
+  const queryValues = [title, description, status, due_date];
+
+  const response = await db.query(
+    `INSERT INTO tasks
+        (title, description, status, due_date)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;`,
+    queryValues
+  );
+
+  const task = response.rows[0];
+
+  return task;
+};
