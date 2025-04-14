@@ -11,6 +11,27 @@ beforeEach(() => {
 afterAll(() => {
   db.end();
 });
+describe("GET /api/tasks", () => {
+  test("STATUS 200: returns an array of tasks objects with correct properties", () => {
+    return request(app)
+      .get("/api/tasks")
+      .expect(200)
+      .then((response) => {
+        const tasks = response.body.tasks;
+
+        expect(tasks.length).toBe(5);
+        tasks.forEach((task) => {
+          expect(task).toMatchObject({
+            task_id: expect.any(Number),
+            title: expect.any(String),
+            description: expect.any(String),
+            status: expect.any(String),
+            due_date: expect.any(String),
+          });
+        });
+      });
+  });
+});
 
 describe("GET /api/tasks/:task_id", () => {
   test("STATUS 200: responds with a correct task object", () => {

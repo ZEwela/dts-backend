@@ -1,4 +1,18 @@
-import { insertTask, selectTaskById } from "../models/tasks.model.js";
+import {
+  insertTask,
+  selectTaskById,
+  selectAllTasks,
+} from "../models/tasks.model.js";
+
+export const getAllTasks = (req, res, next) => {
+  selectAllTasks()
+    .then((tasks) => {
+      res.status(200).send({ tasks });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
 
 export const getTaskById = (req, res, next) => {
   const taskId = req.params.task_id;

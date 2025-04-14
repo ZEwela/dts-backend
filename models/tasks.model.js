@@ -1,5 +1,11 @@
 import db from "../db/connection.js";
 
+export const selectAllTasks = async () => {
+  return await db.query(`SELECT * FROM tasks;`).then((result) => {
+    return result.rows;
+  });
+};
+
 export const selectTaskById = async (taskId) => {
   const response = await db.query(
     `SELECT *
