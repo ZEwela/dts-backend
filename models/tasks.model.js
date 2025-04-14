@@ -50,3 +50,14 @@ export const updateTaskById = async (taskId, status) => {
   const task = response.rows[0];
   return task;
 };
+
+export const deleteTaskById = async (taskId) => {
+  return db
+    .query(`DELETE FROM tasks WHERE task_id = $1 RETURNING *;`, [taskId])
+    .then((response) => {
+      const deletedComment = response.rows[0];
+      if (!deletedComment) {
+        return Promise.reject({ status: 404, msg: "Task not found." });
+      }
+    });
+};

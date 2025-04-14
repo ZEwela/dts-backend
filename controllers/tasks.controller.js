@@ -3,6 +3,7 @@ import {
   selectTaskById,
   selectAllTasks,
   updateTaskById,
+  deleteTaskById,
 } from "../models/tasks.model.js";
 
 export const getAllTasks = (req, res, next) => {
@@ -67,6 +68,18 @@ export const patchTaskStatusByTaskId = (req, res, next) => {
     })
     .then((updatedTask) => {
       res.status(200).send({ task: updatedTask });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+export const removeTaskByTaskId = (req, res, next) => {
+  const taskId = req.params.task_id;
+
+  deleteTaskById(taskId)
+    .then(() => {
+      res.sendStatus(204);
     })
     .catch((err) => {
       next(err);

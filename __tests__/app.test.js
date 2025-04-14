@@ -271,3 +271,27 @@ describe("PATCH /api/tasks/:task_id", () => {
       });
   });
 });
+
+describe("DELETE /api/tasks/:task_id", () => {
+  test("STATUS 204: returns correct status after deleting a task", () => {
+    return request(app).delete("/api/tasks/1").expect(204);
+  });
+  test("STATUS 404: returns an error when passed non-existent but valid task_id", () => {
+    return request(app)
+      .delete("/api/tasks/9999")
+      .expect(404)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Task not found.");
+      });
+  });
+  test("STATUS 400: returns an error when passed invalid task_id", () => {
+    return request(app)
+      .delete("/api/tasks/not-valid")
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+        expect(error.msg).toBe("Bad request.");
+      });
+  });
+});
