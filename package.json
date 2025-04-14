@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node listen.js",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "prepare": "husky",
     "precommit": "eslint .",
     "setup-dbs": "psql -f ./db/setup.sql",
@@ -25,6 +25,8 @@
     "supertest": "^7.1.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "@babel/register": "^7.25.9",
     "@eslint/js": "^9.24.0",
     "eslint": "^9.24.0",
     "eslint-plugin-jest": "^28.11.0",
