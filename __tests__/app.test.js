@@ -70,15 +70,9 @@ describe("GET /api/tasks/:task_id", () => {
 });
 
 describe("POST /api/tasks", () => {
-  // Get the current date
   const futureDate = new Date();
-  // Add 5 days
   futureDate.setDate(futureDate.getDate() + 5);
-  // Format it in 'YYYY-MM-DD HH:MM:SS'
-  const formattedFutureDate = futureDate
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  const formattedFutureDate = futureDate.toISOString();
 
   test("STATUS 201: responds with a new task object", () => {
     const body = {
@@ -150,8 +144,38 @@ describe("POST /api/tasks", () => {
       .expect(400)
       .then((response) => {
         const error = response.body;
-
-        expect(error.msg).toBe("Bad request.");
+        expect(error.msg).toBe("Bad request. Missing required fields.");
       });
+  });
+  test("STATUS 400: returns error for invalid due_date", () => {
+    const body = {
+      title: "Task with bad date",
+      description: "Oops",
+      due_date: "not-a-real-date",
+    };
+
+    return request(app)
+      .post("/api/tasks")
+      .send(body)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Invalid timestamp format.");
+      });
+  });
+
+  test("400: invalid status value ", async () => {
+    const body = {
+      title: "Wrong status",
+      description: "This task has a status not in the list",
+      status: "DefinitelyNotAStatus",
+      due_date: formattedFutureDate,
+    };
+
+    const response = await request(app)
+      .post("/api/tasks")
+      .send(body)
+      .expect(400);
+
+    expect(response.body.msg).toBe("Invalid status value.");
   });
 });

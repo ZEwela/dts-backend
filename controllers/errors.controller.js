@@ -9,6 +9,9 @@ export const handleCustomErrors = (err, req, res, next) => {
 export const handlePSQLErrors = (err, req, res, next) => {
   if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad request." });
+  } else if (err.code === "22007") {
+    // PostgreSQL invalid_timestamp error
+    return res.status(400).send({ msg: "Invalid timestamp format." });
   } else {
     next(err);
   }

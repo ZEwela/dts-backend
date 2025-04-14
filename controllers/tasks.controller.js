@@ -25,14 +25,24 @@ export const getTaskById = (req, res, next) => {
     });
 };
 
-export const postTask = (req, res, next) => {
-  const body = req.body;
+export const postTask = async (req, res, next) => {
+  try {
+    const { title, description, status = "Pending", due_date } = req.body;
 
-  insertTask(body)
-    .then((task) => {
-      res.status(201).send({ task });
-    })
-    .catch((err) => {
-      next(err);
-    });
+    const validStatuses = ["Pending", "In Progress", "Completed"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).send({ msg: "Invalid status value." });
+    }
+
+    if (!title || !due_date) {
+      return res
+        .status(400)
+        .send({ msg: "Bad request. Missing required fields." });
+    }
+
+    const task = await insertTask({ title, description, status, due_date });
+    res.status(201).send({ task });
+  } catch (err) {
+    next(err);
+  }
 };
