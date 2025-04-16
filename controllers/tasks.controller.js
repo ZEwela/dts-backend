@@ -7,7 +7,16 @@ import {
 } from "../models/tasks.model.js";
 
 export const getAllTasks = (req, res, next) => {
-  selectAllTasks()
+  let { status } = req.query;
+
+  if (status) {
+    const validStatuses = ["Pending", "In Progress", "Completed", "All"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).send({ msg: "Invalid status value." });
+    }
+  }
+
+  selectAllTasks(status)
     .then((tasks) => {
       res.status(200).send({ tasks });
     })

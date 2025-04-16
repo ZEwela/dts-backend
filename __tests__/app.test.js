@@ -31,6 +31,39 @@ describe("GET /api/tasks", () => {
         });
       });
   });
+  test("STATUS 200: returns an array of tasks objects filtered by status query", () => {
+    const status = "Pending";
+    return request(app)
+      .get(`/api/tasks?status=${status}`)
+      .expect(200)
+      .then((response) => {
+        const tasks = response.body.tasks;
+        tasks.forEach((task) => {
+          expect(task.status).toBe(status);
+        });
+      });
+  });
+  test("STATUS 200: returns an empty array if there are not any tasks with provided status query", () => {
+    const status = "Completed";
+    return request(app)
+      .get(`/api/tasks?status=${status}`)
+      .expect(200)
+      .then((response) => {
+        const tasks = response.body.tasks;
+        expect(tasks.length).toBe(0);
+      });
+  });
+  test("STATUS 400: returns an error if provided status is not valid", () => {
+    const status = "not-valid";
+    return request(app)
+      .get(`/api/tasks?status=${status}`)
+      .expect(400)
+      .then((response) => {
+        const error = response.body;
+
+        expect(error.msg).toBe("Invalid status value.");
+      });
+  });
 });
 
 describe("GET /api/tasks/:task_id", () => {
