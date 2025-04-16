@@ -17,7 +17,7 @@ export const tasks = [
     title: "Design homepage UI",
     description:
       "Create a responsive homepage design with mock data for the landing page.",
-    status: "Completed",
+    status: "Pending",
     due_date: new Date("2025-04-10T17:00:00Z"),
   },
   {

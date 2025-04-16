@@ -8,7 +8,8 @@
     "prepare": "husky",
     "precommit": "eslint .",
     "setup-dbs": "psql -f ./db/setup.sql",
-    "seed": "node ./db/seeds/run-seed.js"
+    "seed": "node ./db/seeds/run-seed.js",
+    "seed-dev": "NODE_ENV=development npm run seed"
   },
   "keywords": [],
   "type": "module",
