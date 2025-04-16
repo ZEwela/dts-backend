@@ -1,14 +1,28 @@
 import db from "../db/connection.js";
 
-export const selectAllTasks = async (status) => {
+export const selectAllTasks = async (status, page, limit) => {
   let query = "SELECT * FROM tasks";
   let params = [];
+  let countQuery = "SELECT COUNT(*) FROM tasks";
+
   if (status && status !== "All") {
     query += " WHERE status = $1";
+    countQuery += " WHERE status = $1";
     params.push(status);
   }
+
+  const countResult = await db.query(countQuery, params);
+  const totalCount = parseInt(countResult.rows[0].count, 10);
+  const totalPages = Math.ceil(totalCount / limit);
+
+  query += " LIMIT $" + (params.length + 1) + " OFFSET $" + (params.length + 2);
+  params.push(limit, (page - 1) * limit);
+
   const result = await db.query(query, params);
-  return result.rows;
+  return {
+    tasks: result.rows,
+    totalPages,
+  };
 };
 
 export const selectTaskById = async (taskId) => {

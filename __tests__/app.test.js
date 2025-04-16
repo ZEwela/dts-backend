@@ -18,8 +18,6 @@ describe("GET /api/tasks", () => {
       .expect(200)
       .then((response) => {
         const tasks = response.body.tasks;
-
-        expect(tasks.length).toBe(5);
         tasks.forEach((task) => {
           expect(task).toMatchObject({
             task_id: expect.any(Number),
@@ -29,6 +27,25 @@ describe("GET /api/tasks", () => {
             due_date: expect.any(String),
           });
         });
+      });
+  });
+  test("STATUS 200: returns an array of tasks from 'page' specified by page query", () => {
+    return request(app)
+      .get("/api/tasks?page=2")
+      .expect(200)
+      .then((response) => {
+        const tasks = response.body.tasks;
+
+        expect(tasks[0].task_id).toBe(11);
+      });
+  });
+  test("STATUS 200: returns an empty array if the provided 'page' query value refers to page that is bigger than accessible pages", () => {
+    return request(app)
+      .get("/api/tasks?page=4")
+      .expect(200)
+      .then((response) => {
+        const tasks = response.body.tasks;
+        expect(tasks.length).toBe(0);
       });
   });
   test("STATUS 200: returns an array of tasks objects filtered by status query", () => {

@@ -7,7 +7,7 @@ import {
 } from "../models/tasks.model.js";
 
 export const getAllTasks = (req, res, next) => {
-  let { status } = req.query;
+  let { status, page = 1, limit = 10 } = req.query;
 
   if (status) {
     const validStatuses = ["Pending", "In Progress", "Completed", "All"];
@@ -16,9 +16,21 @@ export const getAllTasks = (req, res, next) => {
     }
   }
 
-  selectAllTasks(status)
-    .then((tasks) => {
-      res.status(200).send({ tasks });
+  page = parseInt(page);
+  limit = parseInt(limit);
+
+  if (isNaN(page) || page <= 0) {
+    console.error("I should be jeere");
+    return res.status(400).send({ msg: "Invalid page number." });
+  }
+
+  if (isNaN(limit) || limit <= 0) {
+    return res.status(400).send({ msg: "Invalid limit number." });
+  }
+
+  selectAllTasks(status, page, limit)
+    .then(({ tasks, totalPages }) => {
+      res.status(200).send({ tasks, totalPages });
     })
     .catch((err) => {
       next(err);
