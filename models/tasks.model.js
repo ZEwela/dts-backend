@@ -40,12 +40,12 @@ export const selectTaskById = async (taskId) => {
 };
 
 export const insertTask = async ({
-  title,
-  description,
+  sanitizedTitle,
+  sanitizedDescription,
   status = "Pending",
   due_date,
 }) => {
-  const queryValues = [title, description, status, due_date];
+  const queryValues = [sanitizedTitle, sanitizedDescription, status, due_date];
 
   const response = await db.query(
     `INSERT INTO tasks

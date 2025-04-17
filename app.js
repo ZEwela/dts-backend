@@ -4,6 +4,7 @@ import apiRouter from "./routes/api-router.js";
 import {
   handleCustomErrors,
   handlePSQLErrors,
+  handleServerError,
 } from "./controllers/errors.controller.js";
 
 const app = express();
@@ -18,5 +19,6 @@ app.get("/", (req, res) => {
 
 app.use(handleCustomErrors);
 app.use(handlePSQLErrors);
+app.use(handleServerError);
 
 export default app;

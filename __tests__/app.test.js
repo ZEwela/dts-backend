@@ -181,7 +181,23 @@ describe("POST /api/tasks", () => {
         expect(task).not.toHaveProperty("toIgnore");
       });
   });
-  test("STATUS 400: returns an error when the request body does not contain all the required values", () => {
+
+  test("STATUS 201: returns a new task with a HTML in title/description escaped", async () => {
+    const body = {
+      title: "<script>alert('XSS')</script>",
+      description: "<img src='x' onerror='stealCookies()'>",
+      status: "Pending",
+      due_date: formattedFutureDate,
+    };
+
+    const res = await request(app).post("/api/tasks").send(body).expect(201);
+
+    expect(res.body.task.title).not.toMatch(/<script>/i);
+    expect(res.body.task.description).toMatch(
+      /onerror=&#x27;stealCookies\(\)&#x27;/
+    );
+  });
+  test("STATUS 400: returns an error when the request body does not contain all the required values (title)", () => {
     const body = {
       description: "New Description",
       status: "Pending",
@@ -193,9 +209,21 @@ describe("POST /api/tasks", () => {
       .send(body)
       .expect(400)
       .then((response) => {
-        const error = response.body;
-        expect(error.msg).toBe("Bad request. Missing required fields.");
+        expect(response.body.errors[0].msg).toBe("Title is required.");
       });
+  });
+
+  test("STATUS 400: returns an error when the request body does not contain all the required values (due date)", async () => {
+    const body = {
+      title: "Task without due date",
+      description: "This will fail",
+    };
+
+    const response = await request(app)
+      .post("/api/tasks")
+      .send(body)
+      .expect(400);
+    expect(response.body.errors[0].msg).toBe("Due date is required.");
   });
   test("STATUS 400: returns error for invalid due_date", () => {
     const body = {
@@ -209,11 +237,11 @@ describe("POST /api/tasks", () => {
       .send(body)
       .expect(400)
       .then((response) => {
-        expect(response.body.msg).toBe("Invalid timestamp format.");
+        expect(response.body.errors[0].msg).toBe("Invalid due date format.");
       });
   });
 
-  test("400: invalid status value ", async () => {
+  test("STATUS 400: invalid status value ", async () => {
     const body = {
       title: "Wrong status",
       description: "This task has a status not in the list",
@@ -225,8 +253,7 @@ describe("POST /api/tasks", () => {
       .post("/api/tasks")
       .send(body)
       .expect(400);
-
-    expect(response.body.msg).toBe("Invalid status value.");
+    expect(response.body.errors[0].msg).toBe("Invalid status value.");
   });
 });
 
