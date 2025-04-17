@@ -8,9 +8,12 @@ This project is a backend API built with **Node.js**, **Express**, and **Postgre
 
 - Full REST API for task management
 - PostgreSQL integration using `pg`
+- Native ES Modules
+- XSS-safe inputs via HTML escaping
 - Environment-based configuration
 - Seeding with sample data
 - Error handling middleware
+- Strong test coverage with edge cases
 - Prepared for expansion (users, comments, etc.)
 
 ---
@@ -26,9 +29,12 @@ backend/
 │   ├── seeds/
 │   │   ├── run-seed.js      # Entrypoint for seeding
 │   │   └── seed.js          # Logic for inserting data
-│   └── test-data/
+│   ├── test-data/
+│   |   ├── tasks.js         # Task data for seeding
+│   |   └── index.js         # Export of test data
+│   └── development-data/
 │       ├── tasks.js         # Task data for seeding
-│       └── index.js         # Export of test data
+│       └── index.js         # Export of development data
 ├── routes/
 │   ├── api-router.js        # All API routes mounted here
 │   └── tasks-router.js      # Routes for task operations
@@ -64,12 +70,6 @@ PGDATABASE=your_dev_db_name
 PGDATABASE=your_test_db_name
 ```
 
-#### `.env.production`
-
-```
-DATABASE_URL=your_production_db_url
-```
-
 ---
 
 ## 🗃️ Database Setup
@@ -79,6 +79,7 @@ DATABASE_URL=your_production_db_url
 ```bash
 npm run setup-dbs   # Creates the database
 npm run seed        # Seeds the database with test data
+npm run seed-dev    # Seeds the database with development data
 ```
 
 ---
@@ -102,7 +103,8 @@ By default, the server will run on [http://localhost:9090](http://localhost:9090
   "prepare": "husky",
   "precommit": "eslint .",
   "setup-dbs": "psql -f ./db/setup.sql",
-  "seed": "node ./db/seeds/run-seed.js"
+  "seed": "node ./db/seeds/run-seed.js",
+  "seed-dev": "NODE_ENV=development npm run seed"
 }
 ```
 
@@ -117,6 +119,25 @@ By default, the server will run on [http://localhost:9090](http://localhost:9090
 | GET    | `/api/tasks/:id` | Get a task by ID     |
 | PATCH  | `/api/tasks/:id` | Update a task status |
 | DELETE | `/api/tasks/:id` | Delete a task        |
+
+---
+
+## 📄 Query Parameters
+
+### GET /api/tasks
+
+You can pass query parameters to filter and paginate results.
+
+| Query Param | Type    | Description                                                       |
+| ----------- | ------- | ----------------------------------------------------------------- |
+| `page`      | Integer | Specifies the page number (10 tasks per page)                     |
+| `status`    | String  | Filters tasks by status: `Pending`, `In Progress`, or `Completed` |
+
+**Examples:**
+
+- `/api/tasks?page=2` → Returns tasks on the second page
+- `/api/tasks?status=Pending` → Returns only tasks with status "Pending"
+- `/api/tasks?&status=Completed&page=1` → Paginated and filtered
 
 ---
 
@@ -145,7 +166,6 @@ npm test
 ## 📌 Notes
 
 - This project uses native ES modules. Ensure your `package.json` includes `"type": "module"`.
-- Error handling is standardized through custom and PostgreSQL error middleware.
 - The server defaults to port `9090` unless otherwise specified.
 
 ---
