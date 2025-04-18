@@ -23,7 +23,6 @@ export const getAllTasks = (req, res, next) => {
   limit = parseInt(limit);
 
   if (isNaN(page) || page <= 0) {
-    console.error("I should be jeere");
     return res.status(400).send({ msg: "Invalid page number." });
   }
 
